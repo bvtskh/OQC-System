@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1209
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OQC", "OQC\OQC.csproj", "{764FD23F-1855-4601-871B-8DC94A0956E7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommonProject", "..\..\CommonProject\CommonProject\CommonProject.csproj", "{DE1D6FCC-616B-46BE-A715-25F2BA6BA664}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{764FD23F-1855-4601-871B-8DC94A0956E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{764FD23F-1855-4601-871B-8DC94A0956E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{764FD23F-1855-4601-871B-8DC94A0956E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{764FD23F-1855-4601-871B-8DC94A0956E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE1D6FCC-616B-46BE-A715-25F2BA6BA664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE1D6FCC-616B-46BE-A715-25F2BA6BA664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE1D6FCC-616B-46BE-A715-25F2BA6BA664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE1D6FCC-616B-46BE-A715-25F2BA6BA664}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DD7F8897-5211-4399-A52F-282D01AA548B}
+	EndGlobalSection
+EndGlobal

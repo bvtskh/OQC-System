@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="2bed47c903d5457c8ad3e938f6c49cbe" Name="Diagram1">
+        <EntityTypeShape EntityType="ClaimFormModel.TypeNG" Width="1.5" PointX="2.75" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ClaimFormModel.TargetPPM" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="ClaimFormModel.Area" Width="1.5" PointX="0.875" PointY="2.875" />
+        <EntityTypeShape EntityType="ClaimFormModel.Role" Width="1.5" PointX="0.75" PointY="5.375" />
+        <EntityTypeShape EntityType="ClaimFormModel.User" Width="1.5" PointX="3" PointY="5.75" />
+        <AssociationConnector Association="ClaimFormModel.FK_RolesUser" />
+        <EntityTypeShape EntityType="ClaimFormModel.ODI" Width="1.5" PointX="5.375" PointY="3.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
