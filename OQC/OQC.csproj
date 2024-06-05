@@ -75,6 +75,9 @@
     <Reference Include="AdvancedDataGridView, Version=0.1.0.10, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ADGV.0.1.0.10\lib\net40\AdvancedDataGridView.dll</HintPath>
     </Reference>
+    <Reference Include="AntdUI, Version=1.2.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AntdUI.1.2.10\lib\net40\AntdUI.dll</HintPath>
+    </Reference>
     <Reference Include="Bet.Util, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\Debug\Bet.Util.dll</HintPath>
@@ -104,6 +107,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
@@ -151,6 +155,12 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Constants.cs" />
+    <Compile Include="FormBarcode.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormBarcode.Designer.cs">
+      <DependentUpon>FormBarcode.cs</DependentUpon>
+    </Compile>
     <Compile Include="FormCaculator.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -225,6 +235,9 @@
     <Compile Include="User.cs">
       <DependentUpon>ODIModel.tt</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="FormBarcode.resx">
+      <DependentUpon>FormBarcode.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FormCaculator.resx">
       <DependentUpon>FormCaculator.cs</DependentUpon>
     </EmbeddedResource>
@@ -624,6 +637,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\icons8-barcode-22.png" />
     <None Include="Resources\list-icon.png" />
     <None Include="Resources\filter-icon.png" />
     <None Include="Resources\find-icon.png" />

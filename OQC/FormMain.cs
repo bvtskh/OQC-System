@@ -21,6 +21,8 @@ namespace OQC
 
         List<TypeNG> listNG = new List<TypeNG>();
         USAPService.USAPWebServiceSoapClient usapService = new USAPService.USAPWebServiceSoapClient();
+        int originQty = 0;
+
         public string[] areas = new string[]
         {
             Areas.AUTO,
@@ -369,7 +371,7 @@ namespace OQC
                 {
                     NG_Photo = Guid.NewGuid().ToString() + Path.GetFileName(choofdlog.FileName);
                     pbNG.Image = new Bitmap(choofdlog.FileName);
-                    Utils.UploadFile("172.28.10.17", @"VN\U34811", "hoan200794", choofdlog.FileName, @"\OQC\" + NG_Photo);
+                    Utils.UploadFile("172.28.10.17", @"VN\share", "0FFP@ssw0rd", choofdlog.FileName, @"\OQC\" + NG_Photo);
                 }
             }
             catch (Exception ex)
@@ -391,7 +393,7 @@ namespace OQC
                 {
                     OK_Photo = Guid.NewGuid().ToString() + Path.GetFileName(choofdlog.FileName);
                     pbOK.Image = new Bitmap(choofdlog.FileName);
-                    Utils.UploadFile("172.28.10.17", @"VN\U34811", "hoan200794", choofdlog.FileName, @"\OQC\" + OK_Photo);
+                    Utils.UploadFile("172.28.10.17", @"VN\share", "0FFP@ssw0rd", choofdlog.FileName, @"\OQC\" + OK_Photo);
                 }
             }
             catch (Exception ex)
@@ -597,10 +599,31 @@ namespace OQC
                     }
                     btnCreate.Visible = false;
                     updateAll();
-
+                    if(originQty != int.Parse(txbWOQty.Text))
+                    {
+                        SaveQtyChangeLog(0,originQty, int.Parse(txbWOQty.Text), txbWO.Text, txbInspector.Text); 
+                    }
                 }
             }
         }
+
+        /// <summary>
+        /// bắt quả tang nó thay đổi Qty
+        /// </summary>
+        /// <param name="originQty"></param>
+        /// <param name="changeQty"></param>
+        /// <param name="Wo"></param>
+        /// <param name="Inspector"></param>
+        private void SaveQtyChangeLog(int changeId, int originQty, int changeQty, string wo, string inspector)
+        {
+            using (var db = new ClaimFormEntities())
+            {
+                string sql = $@"insert into [ClaimForm].[dbo].[ChangeQtyLogs]([CHANGE_ID],[CHANGE_NAME],[WO],[INSPECTOR],[MACHINE_NAME],[UPD_TIME])
+                             values('{changeId}',N'Số lượng({originQty}->{changeQty})','{wo}','{inspector}','{System.Environment.MachineName}','{DateTime.Now}')";
+                db.Database.ExecuteSqlCommand(sql);
+            }
+        }
+
         private void ResetDataKeepInspector()
         {
 
@@ -784,8 +807,8 @@ namespace OQC
         {
             SearchModelByWork();
             var qty = SearchQtyByWo(txbWO.Text.Trim());
-            txbModelName.SelectAll();
-            txbModelName.Focus();
+            txbNumerCheck.SelectAll();
+            txbNumerCheck.Focus();
             if (qty == 0)
             {
                 txbWOQty.Enabled = true;
@@ -794,15 +817,16 @@ namespace OQC
             {
                 txbWOQty.Enabled = PermisionHelper.CheckIsLeader() ? true : false;
                 txbWOQty.Text = qty.ToString();
-            }
-           
+                originQty = qty;
+                txbWOQty.ReadOnly = true;
+            } 
         }
 
         private int SearchQtyByWo(string WO)
         {
             using (var db = new ClaimFormEntities())
             {
-                var wo = db.ODIs.Where(m => m.WO == WO).FirstOrDefault();
+                var wo = db.ODIs.Where(m => m.WO.Contains(WO)).FirstOrDefault();
                 if (wo != null) return wo.WOQty;
                 else return 0;
             }
@@ -810,33 +834,54 @@ namespace OQC
 
         private void SearchModelByWork()
         {
-            var BCLBFLMInfo = usapService.GetByTnNo("002000" + txbWO.Text);
-            string partNo = "";
-            if (BCLBFLMInfo != null)
+            try
             {
-                partNo = BCLBFLMInfo.PART_NO;
-            }
-            else
-            {
-                var order = SingletonHelper.PvsInstance.GetWorkOrdersByOrderNo("2000" + txbWO.Text);
-                if (order != null)
+                var BCLBFLMInfo = usapService.GetByTnNo("002000" + txbWO.Text);
+                string partNo = "";
+                if (BCLBFLMInfo != null)
                 {
-                    partNo = order.PRODUCT_ID;
+                    partNo = BCLBFLMInfo.PART_NO;
                 }
+                else
+                {
+                    var order = SingletonHelper.PvsInstance.GetWorkOrdersByOrderNo("2000" + txbWO.Text);
+                    if (order != null)
+                    {
+                        partNo = order.PRODUCT_ID;
+                    }
+                }
+                var split = partNo.Split('-');
+                if (split != null && split.Length == 3 && split[2].Contains("000SS0"))
+                {
+                    partNo = split[0] + "-" + split[1];
+                }
+                txbModelName.Text = partNo;
+                GetTotalByModel();
+
+                //var modelInfo = SingletonHelper.PvsInstance.GetModelInfo(txbModelName.Text.Trim());
+                //if (modelInfo != null && !string.IsNullOrEmpty(modelInfo.Group_Id))
+                //{
+                //    txbGroupModel.Text = modelInfo.Group_Id;
+                //}
+                txbGroupModel.Text = GetGroupModel(txbModelName.Text.Trim());
             }
-            var split = partNo.Split('-');
-            if (split != null && split.Length == 3 && split[2].Contains("000SS0"))
+            catch (Exception)
             {
-                partNo = split[0] + "-" + split[1];
+                return;
             }
-            txbModelName.Text = partNo;
-            GetTotalByModel();
-            var modelInfo = SingletonHelper.PvsInstance.GetModelInfo(txbModelName.Text.Trim());
-            if (modelInfo != null && !string.IsNullOrEmpty(modelInfo.Group_Id))
+           
+        }
+
+        private string GetGroupModel(string model)
+        {
+            using (var db = new ClaimFormEntities())
             {
-                txbGroupModel.Text = modelInfo.Group_Id;
+                var wo = db.ODIs.Where(m => m.ModelName == model).FirstOrDefault();
+                if (wo != null) return wo.GroupModel;
+                else return "";
             }
         }
+
         private void txbNumerCheck_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             if (e.KeyCode == Keys.Enter)
@@ -1099,6 +1144,10 @@ namespace OQC
                     txbModelName.Text = odi.ModelName;
                     txbWO.Text = odi.WO;
                     txbWOQty.Text = odi.WOQty.ToString();
+
+                    originQty = odi.WOQty;
+                    txbWOQty.ReadOnly = true;
+
                     txbNumerCheck.Text = odi.CheckNumber.ToString();
                     txbNumberNG.Text = odi.NumberNG.ToString();
                     txbNote.Text = odi.Note;
@@ -1112,7 +1161,7 @@ namespace OQC
                     {
                         NG_Photo = odi.NG_Photo;
                         pbNG.Image = new Bitmap(
-                            Utils.DownloadFile("172.28.10.17", @"VN\U34811", "hoan200794", Application.StartupPath + "/" + odi.NG_Photo,
+                            Utils.DownloadFile("172.28.10.17", @"VN\share", "0FFP@ssw0rd", Application.StartupPath + "/" + odi.NG_Photo,
                             "/OQC/" + odi.NG_Photo));
                     }
                     else
@@ -1123,7 +1172,7 @@ namespace OQC
                     if (!string.IsNullOrEmpty(odi.OK_Photo))
                     {
                         OK_Photo = odi.OK_Photo;
-                        pbOK.Image = new Bitmap(Utils.DownloadFile("172.28.10.17", @"VN\U34811", "hoan200794", Application.StartupPath + "/" + odi.OK_Photo, "/OQC/" + odi.OK_Photo));
+                        pbOK.Image = new Bitmap(Utils.DownloadFile("172.28.10.17", @"VN\share", "0FFP@ssw0rd", Application.StartupPath + "/" + odi.OK_Photo, "/OQC/" + odi.OK_Photo));
 
                     }
                     else
@@ -1550,6 +1599,24 @@ namespace OQC
             {
                 txbWOEnterFinish();
             }
+        }
+
+        private void btnScan_Click(object sender, EventArgs e)
+        {
+            new FormBarcode(new Action<string>(GetWoFormBarcode)).ShowDialog();
+        }
+
+        private void GetWoFormBarcode(string value)
+        {
+            txbWO.Text=value;
+            txbWOEnterFinish();
+        }
+
+        private void btnEditQty_Click(object sender, EventArgs e)
+        {
+            txbWOQty.ReadOnly = false;
+            txbWOQty.SelectAll();
+            txbWOQty.Focus();
         }
     }
 }
